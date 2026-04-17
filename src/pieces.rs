@@ -1,3 +1,6 @@
+//for all valid letters
+use crate::globals::LETTERS;
+
 //enum for piece colour
 #[derive(Debug)]
 pub enum Colour {
@@ -22,7 +25,8 @@ pub struct Piece {
     piece_type: PieceType,
     //x coord - number
     x: u8,
-    //y coord - on a chessboard it is a letter but here i switched it for number
+    //y coord - using u8, because in rust that is how you do 
+    //8 bit chars, because the type char is 32 bit
     y: u8,
     //colour - black or white
     colour: Colour,
@@ -33,8 +37,8 @@ impl Piece {
     pub fn new(piece_type: PieceType, x: u8, y: u8, colour: Colour) -> Option<Piece> {
         //check whether values are valid - haha i forgot this is rust, i don't have
         //to check - hohoho
-        //actually i have to check whether x and y are not more than 8
-        if x <= 8 && y <= 8 {
+        //check whether x and y are valid
+        if x <= 8 && LETTERS.contains(&y) {
             Some(Piece {
                 piece_type,
                 x,
