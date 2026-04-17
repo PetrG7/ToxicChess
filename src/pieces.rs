@@ -2,7 +2,7 @@
 use crate::globals::LETTERS;
 
 //enum for piece colour
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum Colour {
     Black,
     White,
@@ -23,10 +23,10 @@ pub enum PieceType {
 pub struct Piece {
     //type - bishop, pawn...
     piece_type: PieceType,
-    //x coord - number
-    x: u8,
-    //y coord - using u8, because in rust that is how you do 
+    //x coord- using u8, because in rust that is how you do
     //8 bit chars, because the type char is 32 bit
+    x: u8,
+    //y coord - number on the side
     y: u8,
     //colour - black or white
     colour: Colour,
@@ -38,7 +38,7 @@ impl Piece {
         //check whether values are valid - haha i forgot this is rust, i don't have
         //to check - hohoho
         //check whether x and y are valid
-        if x <= 8 && LETTERS.contains(&y) {
+        if y <= 8 && LETTERS.contains(&x) {
             Some(Piece {
                 piece_type,
                 x,
@@ -48,5 +48,24 @@ impl Piece {
         } else {
             None
         }
+    }
+    //implement a function for fetching the x and y coords, since I want to keep
+    //my struct fields private
+    pub fn get_x(&self) -> u8 {
+        //it copies the value before returning so its fine
+        self.x
+    }
+    pub fn get_y(&self) -> u8 {
+        //it copies the value before returning so its fine i guess
+        self.y
+    }
+
+    //for getting piece type - debbuging drawing
+    pub fn get_piece_type(&self) -> &PieceType{
+    	&self.piece_type
+    }
+    //for getting piece colour
+    pub fn get_piece_colour(&self) -> &Colour{
+    	&self.colour
     }
 }
