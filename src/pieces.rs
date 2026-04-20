@@ -8,7 +8,7 @@ pub enum Colour {
     White,
 }
 //enum for piece type
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum PieceType {
     Pawn,
     Knight,
@@ -36,12 +36,18 @@ pub struct Piece {
 
 //functions for Piece struct
 impl Piece {
-    pub fn new(piece_type: PieceType, x: u8, y: u8, colour: Colour, has_moved: bool) -> Option<Piece> {
+    pub fn new(
+        piece_type: PieceType,
+        x: u8,
+        y: u8,
+        colour: Colour,
+        has_moved: bool,
+    ) -> Option<Self> {
         //check whether values are valid - haha i forgot this is rust, i don't have
         //to check - hohoho
         //check whether x and y are valid
         if y <= 8 && LETTERS.contains(&x) {
-            Some(Piece {
+            Some(Self {
                 piece_type,
                 x,
                 y,
@@ -64,11 +70,11 @@ impl Piece {
     }
 
     //for getting piece type - debbuging drawing
-    pub fn get_piece_type(&self) -> &PieceType{
-    	&self.piece_type
+    pub fn get_piece_type(&self) -> &PieceType {
+        &self.piece_type
     }
     //for getting piece colour
-    pub fn get_piece_colour(&self) -> &Colour{
-    	&self.colour
+    pub fn get_piece_colour(&self) -> &Colour {
+        &self.colour
     }
 }

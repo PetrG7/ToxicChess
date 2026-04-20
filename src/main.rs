@@ -29,8 +29,13 @@ fn main() {
         board.push(Piece::new(PieceType::Pawn, letter, 3, Colour::White, false).unwrap());
     }
     //init GameState
+    //demonstrating the Result of BoardState::new
     let gamestate = BoardState::new(board);
-    draw(&gamestate);
+    match gamestate{
+    	Ok(state) => draw(&state),
+    	Err(e) => println!("{}", e),
+    }
+    
 
     let gamestate_default = BoardState::populate_default();
     draw(&gamestate_default);
@@ -38,7 +43,7 @@ fn main() {
 
     //testing occupied squares function
     let occupied = gamestate_default.occupied_squares();
-    println!("{:?}", occupied);
+    // println!("{:?}", occupied);
 
-    
+    gamestate_default.legal_moves(occupied);
 }
