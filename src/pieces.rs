@@ -1,209 +1,74 @@
-//holds the pieces structs and the functions implemented for these pieces
-//is that the most effective way? NO, but i want to learn before chasing effectiveness
+//for all valid letters
+use crate::globals::LETTERS;
+
+//enum for piece colour
+#[derive(Debug, PartialEq)]
+pub enum Colour {
+    Black,
+    White,
+}
+//enum for piece type
 #[derive(Debug)]
-pub struct Pawn {
-    number: u8,
-    letter: u8,   //holds a classic ascii char
-    colour: bool, //lets say 1 for white and 0 for black
+pub enum PieceType {
+    Pawn,
+    Knight,
+    Bishop,
+    Rook,
+    Queen,
+    King,
+}
+
+//stucture that will hold information about a individual piece
+#[derive(Debug)]
+pub struct Piece {
+    //type - bishop, pawn...
+    piece_type: PieceType,
+    //x coord- using u8, because in rust that is how you do
+    //8 bit chars, because the type char is 32 bit
+    x: u8,
+    //y coord - number on the side
+    y: u8,
+    //colour - black or white
+    colour: Colour,
+    //will have to put this here, it will not apply for all pieces, but its seems like the easiest after trying out a different appproach
     has_moved: bool,
 }
 
-#[derive(Debug)]
-pub struct Knight {
-    number: u8,
-    letter: u8,
-    colour: bool, //lets say 1 for white and 0 for black
-}
-
-#[derive(Debug)]
-pub struct Bishop {
-    number: u8,
-    letter: u8,
-    colour: bool, //lets say 1 for white and 0 for black
-}
-
-#[derive(Debug)]
-pub struct Rook {
-    number: u8,
-    letter: u8,
-    colour: bool, //lets say 1 for white and 0 for black
-    has_moved: bool,
-}
-
-#[derive(Debug)]
-pub struct Queen {
-    number: u8,
-    letter: u8,
-    colour: bool, //lets say 1 for white and 0 for black
-}
-
-#[derive(Debug)]
-pub struct King {
-    number: u8,
-    letter: u8,
-    colour: bool, //lets say 1 for white and 0 for black
-    has_moved: bool,
-}
-
-//enum for all pieces, so its possible to use in a vec
-#[derive(Debug)]
-pub enum Pieces {
-    Pawn(Pawn),
-    Knight(Knight),
-    Bishop(Bishop),
-    Rook(Rook),
-    Queen(Queen),
-    King(King),
-}
-
-//implementing functions that are for all pieces
-impl Pieces {
-    //handle getting the numbers - for position
-    pub fn number(&self) -> u8 {
-        match self {
-            Pieces::Pawn(pawn) => pawn.number,
-            Pieces::Knight(knight) => knight.number,
-            Pieces::Bishop(bishop) => bishop.number,
-            Pieces::Rook(rook) => rook.number,
-            Pieces::Queen(queen) => queen.number,
-            Pieces::King(king) => king.number,
+//functions for Piece struct
+impl Piece {
+    pub fn new(piece_type: PieceType, x: u8, y: u8, colour: Colour, has_moved: bool) -> Option<Piece> {
+        //check whether values are valid - haha i forgot this is rust, i don't have
+        //to check - hohoho
+        //check whether x and y are valid
+        if y <= 8 && LETTERS.contains(&x) {
+            Some(Piece {
+                piece_type,
+                x,
+                y,
+                colour,
+                has_moved,
+            })
+        } else {
+            None
         }
     }
-    //handle getting the letters - for position
-    pub fn letter(&self) -> u8 {
-        match self {
-            Pieces::Pawn(pawn) => pawn.letter,
-            Pieces::Knight(knight) => knight.letter,
-            Pieces::Bishop(bishop) => bishop.letter,
-            Pieces::Rook(rook) => rook.letter,
-            Pieces::Queen(queen) => queen.letter,
-            Pieces::King(king) => king.letter,
-        }
+    //implement a function for fetching the x and y coords, since I want to keep
+    //my struct fields private
+    pub fn get_x(&self) -> u8 {
+        //it copies the value before returning so its fine
+        self.x
     }
-    //handle getting the piece type - bishop, pawn, rook...
-    pub fn piece_type(&self) -> &'static str{
-    	match self {
-    	    Pieces::Pawn(_) => "Pawn",
-    	    Pieces::Knight(_) => "Knight",
-    	    Pieces::Bishop(_) => "Bishop",
-    	    Pieces::Rook(_) => "Rook",
-    	    Pieces::Queen(_) => "Queen",
-    	    Pieces::King(_) => "King",
-    	}
+    pub fn get_y(&self) -> u8 {
+        //it copies the value before returning so its fine i guess
+        self.y
     }
-}
 
-//implementing converting from the individual pieces to the Pieces struct
-// reason -> passing it later to the board struct and i would have to type out
-//the piece type two times, which looks strange
-impl From<Pawn> for Pieces {
-    fn from(pawn: Pawn) -> Self {
-        Pieces::Pawn(pawn)
+    //for getting piece type - debbuging drawing
+    pub fn get_piece_type(&self) -> &PieceType{
+    	&self.piece_type
     }
-}
-
-impl From<Knight> for Pieces {
-    fn from(knight: Knight) -> Self {
-        Pieces::Knight(knight)
-    }
-}
-
-impl From<Bishop> for Pieces {
-    fn from(bishop: Bishop) -> Self {
-        Pieces::Bishop(bishop)
-    }
-}
-
-impl From<Rook> for Pieces {
-    fn from(rook: Rook) -> Self {
-        Pieces::Rook(rook)
-    }
-}
-
-impl From<Queen> for Pieces {
-    fn from(queen: Queen) -> Self {
-        Pieces::Queen(queen)
-    }
-}
-
-impl From<King> for Pieces {
-    fn from(king: King) -> Self {
-        Pieces::King(king)
-    }
-}
-
-//implementing functions and methods for pawn
-impl Pawn {
-    //spawn at location
-    pub fn new(number: u8, letter: u8, colour: bool, has_moved: bool) -> Self {
-        //here prevent spawning on illegal squares - out of bounds, or where other pieces are
-        Self {
-            number,
-            letter,
-            colour,
-            has_moved,
-        }
-    }
-}
-
-//implementing functions and methods for knight
-impl Knight {
-    //spawn at location
-    pub fn new(number: u8, letter: u8, colour: bool) -> Self {
-        Self {
-            number,
-            letter,
-            colour,
-        }
-    }
-}
-
-//implementing functions and methods for bishop
-impl Bishop {
-    //spawn at location
-    pub fn new(number: u8, letter: u8, colour: bool) -> Self {
-        Self {
-            number,
-            letter,
-            colour,
-        }
-    }
-}
-
-//implementing functions and methods for rook
-impl Rook {
-    //spawn at location
-    pub fn new(number: u8, letter: u8, colour: bool, has_moved: bool) -> Self {
-        Self {
-            number,
-            letter,
-            colour,
-            has_moved,
-        }
-    }
-}
-
-//implementing functions and methods for queen
-impl Queen {
-    //spawn at location
-    pub fn new(number: u8, letter: u8, colour: bool) -> Self {
-        Self {
-            number,
-            letter,
-            colour,
-        }
-    }
-}
-
-//implementing functions and methods for king
-impl King {
-    //spawn at location
-    pub fn new(number: u8, letter: u8, colour: bool, has_moved: bool) -> Self {
-        Self {
-            number,
-            letter,
-            colour,
-            has_moved,
-        }
+    //for getting piece colour
+    pub fn get_piece_colour(&self) -> &Colour{
+    	&self.colour
     }
 }

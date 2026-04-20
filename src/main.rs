@@ -1,32 +1,44 @@
-mod board;
+//imports for piece handling
 mod pieces;
-use board::Board;
-use pieces::{Bishop, King, Knight, Pawn, Pieces, Queen, Rook};
+use pieces::Colour;
+use pieces::Piece;
+use pieces::PieceType;
+mod globals;
+use globals::LETTERS;
+mod game;
+use game::BoardState;
+mod debug; // for drawing the board - debugging purpouses
+use debug::draw;
 
 fn main() {
-    println!("Hello, world");
+    println!("Hello, chess!");
 
-    //construct board
-    let mut board = Board::new();
+    //here lies my logic for chessboard initialization
+    //esentially it will be a vector of pieces, also there will be another vector with occupied fields
+    //so that i can easily calculate legal moves
+    let mut board: Vec<Piece> = Vec::new();
 
-    //create a piece
-    let pawn = Pawn::new(4, b'A', false, false);
-
-    board.add(pawn);
-
-    let rook = Rook::new(1, b'A', false, false);
-
-    board.add(rook);
-
-    let king = King::new(2, b'A', false, false);
-
-    board.add(king);
-
-    
-    for piece in &board.pieces {
-        println!("Piece type: {:?}, Piece letter: {:?}, Piece number: {:?}.", piece.piece_type(), piece.letter() as char, piece.number());
+    //"push" my "pieces" onto the "chessboard"
+    //here i put a white bishop on the coords A3 (3 = 3, 1 = A)
+    board.push(Piece::new(PieceType::Bishop, b'H', 5, Colour::White, false).unwrap());
+    //white pawns
+    //the reason for the goofy double borrow is some rust stuff
+    //if there was no & before letter i would have to deref in the board.push call
+    for &letter in &LETTERS {
+        //println!("{}", letter);
+        board.push(Piece::new(PieceType::Pawn, letter, 3, Colour::White, false).unwrap());
     }
-    
+    //init GameState
+    let gamestate = BoardState::new(board);
+    draw(&gamestate);
 
-    //println!("{:?}", board);
+    let gamestate_default = BoardState::populate_default();
+    draw(&gamestate_default);
+    //make a move
+
+    //testing occupied squares function
+    let occupied = gamestate_default.occupied_squares();
+    println!("{:?}", occupied);
+
+    
 }
