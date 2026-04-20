@@ -30,8 +30,15 @@ fn main() {
     }
     //init GameState
     let gamestate = BoardState::new(board);
-    draw(gamestate);
+    draw(&gamestate);
 
-    let gamestate = BoardState::populate_default();
-    draw(gamestate);
+    let gamestate_default = BoardState::populate_default();
+    draw(&gamestate_default);
+    //make a move
+
+    //testing occupied squares function
+    let occupied = gamestate_default.occupied_squares();
+    println!("{:?}", occupied);
+
+    
 }

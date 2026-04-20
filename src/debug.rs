@@ -5,7 +5,7 @@ use crate::pieces::{ PieceType, Piece, Colour };
 
 //function that draws the board into terminal using symbols
 //not scalable, so terminal has to be big enough
-pub fn draw(state: BoardState) {
+pub fn draw(state: &BoardState) {
 
     //get the board
     let current = state.get_board();

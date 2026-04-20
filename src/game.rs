@@ -46,13 +46,26 @@ impl BoardState {
     }
 
     //calculate all the legal moves in the current position
-    fn legal_moves(&self, occupied: Vec<Square>) {
+    
+    fn legal_moves(&self, occupied: Vec<Square>) {// -> Vec<(Piece, Square)>{
         //here determine the legal moves based on
         //1) The type of the piece - bishop, pawn...
         //2) Occupied squares - what can i capture, where can i can not go
         //3) Colour plays a role in step 2
-        todo!();
+
+        //iterate over the pieces
+        for piece in &self.board{
+        	//different rules, for different pieces
+        	let piece_type = piece.get_piece_type();
+
+        	match piece_type{
+        		//Now this is a big problem, i am pretty cooked
+        	}
+        }
+
+        
     }
+    
 
     //return the current board - pieces, their positions, colours, types
     pub fn get_board(&self) -> &Vec<Piece> {
