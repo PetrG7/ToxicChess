@@ -77,4 +77,8 @@ impl Piece {
     pub fn get_piece_colour(&self) -> &Colour {
         &self.colour
     }
+    //for knowing whether the piece has been moved
+    pub fn has_moved(&self) -> &bool {
+    	&self.has_moved
+    }
 }

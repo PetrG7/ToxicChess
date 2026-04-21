@@ -6,7 +6,7 @@ use crate::pieces::Colour;
 use crate::pieces::Piece;
 use crate::pieces::PieceType;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub struct Square {
     //same values as the coordinates for pieces
     x: u8,
@@ -17,10 +17,13 @@ pub struct Square {
 #[derive(Debug)]
 pub struct BoardState {
     board: Vec<Piece>,
+    //spencifies whose turn it is -> for calculating legal moves
+    turn: Colour,
 }
 
 impl BoardState {
-    pub fn new(board: Vec<Piece>) -> Result<Self, &'static str> {
+	//starting_colour meaning which colour starts
+    pub fn new(board: Vec<Piece>, starting_colour: Colour) -> Result<Self, &'static str> {
         //in the future check here whether:
         //1) there are two king pieces of different colours - DONE
         //2) There are not more than 64 pieces - DONE
@@ -77,32 +80,48 @@ impl BoardState {
         }
 
         //Self { board }
-        return Ok(Self { board });
+        return Ok(Self { board, turn: starting_colour});
     }
 
     //return all the squares that are occupied -> maybe in the future
     //optimize this so its a 64 bit number - 64 squares, 64 numbers
     //but now a vector will do
-    pub fn occupied_squares(&self) -> Vec<Square> {
+    //also decided to use the colour variable, which is admittedly a bit inneficient
+    //but also makes my job much easier :)
+    pub fn occupied_squares(&self, colour: &Colour) -> Vec<Square> {
         let mut occupied: Vec<Square> = Vec::new();
         //iter over all the Piece types in the board
         for piece in &self.board {
-            occupied.push(Square {
-                x: piece.get_x(),
-                y: piece.get_y(),
-            });
+        	if piece.get_piece_colour() == colour{
+        		occupied.push(Square {
+        		    x: piece.get_x(),
+        		    y: piece.get_y(),
+        		});
+        	}
         }
         occupied
     }
 
-    //calculate all the legal moves in the current position
-
-    pub fn legal_moves(&self, occupied: Vec<Square>) {
+    //calculate all the legal moves in the current position, for the current turn
+    //NOTE - FIX THIS, IT IS NOT SUPPOSED TO RETURN THE PIECE TYPE BUT THE PIECE, THE PIECE TYPE TELLS ME NOTHING
+    //SUMMARY OF THINGS TO FIX HERE - RETURN PIECE, NOT PIECE TYPE AND ADD THE MODIFIER BASED ON THE COLOURS - BLACK PAWNS GO -1 on Y axis, WHITE GO +1 on Y axis
+    pub fn legal_moves(&self) -> Vec<(&PieceType, Square)> {
         // -> Vec<(Piece, Square)>{
         //here determine the legal moves based on
         //1) The type of the piece - bishop, pawn...
         //2) Occupied squares - what can i capture, where can i can not go
         //3) Colour plays a role in step 2
+
+		//initialization of the variable, so the compiler does not scream at me - fix later hihi
+        let mut occupied = self.occupied_squares(&Colour::White);
+
+        //get all the occupied squares for the colour that is not in turn
+        match self.turn {
+        	Colour::White => {occupied = self.occupied_squares(&Colour::Black);},
+        	Colour::Black => {occupied = self.occupied_squares(&Colour::White);},
+        }
+
+        let mut legal_moves: Vec<(&PieceType, Square)> = vec![];
 
         //iterate over the pieces
         for piece in &self.board {
@@ -111,9 +130,32 @@ impl BoardState {
 
             //println!("{:?}", piece_type);
 
+
+           	//NOTE -> HAVE TO ADD COLOUR MODIFIERS -> BECAUSE WHITE PAWNS CAPTURE UP, WHEREAS BLACK PAWNS CAPTURE DOWN FOR EXAMPLE
+
             match piece_type {
                 //now that we know the piece, each has to abide by their own rules to determine the possible move squares
-                PieceType::Pawn => {}
+                PieceType::Pawn => {
+                	//pawns can go up two, if they have not been moved
+                	if !piece.has_moved() {
+                		//if the pawn has not moved yet
+                		//it can go up 1
+                		legal_moves.push((piece_type, Square { x: piece.get_x(), y: piece.get_y() + 1}));
+						//it can go up 2
+						legal_moves.push((piece_type, Square { x: piece.get_x(), y: piece.get_y() + 2}));
+						//scan occupied squares by the opposite colour, so it can see whether it can capture
+						if occupied.contains(&Square {x: piece.get_x() - 1, y: piece.get_y() + 1}){
+							//pawn can capture to the left
+							legal_moves.push((piece_type, Square { x: piece.get_x() - 1, y: piece.get_y() + 1}));
+						}
+						if occupied.contains(&Square {x: piece.get_x() + 1, y: piece.get_y() + 1}){
+							//pawn can capture to the left
+							legal_moves.push((piece_type, Square { x: piece.get_x() + 1, y: piece.get_y() + 1}));
+						}						
+						//also this is where i will implement en pessent, but that is very difficcult
+						//so for now i'll skip it
+                	}
+                }
                 PieceType::Knight => {}
                 PieceType::Bishop => {}
                 PieceType::Rook => {}
@@ -121,6 +163,8 @@ impl BoardState {
                 PieceType::King => {}
             }
         }
+
+        legal_moves
     }
 
     //return the current board - pieces, their positions, colours, types
@@ -176,6 +220,7 @@ impl BoardState {
         board.push(Piece::new(PieceType::Pawn, b'G', 7, Colour::Black, false).unwrap());
         board.push(Piece::new(PieceType::Pawn, b'H', 7, Colour::Black, false).unwrap());
 
-        BoardState { board }
+		//by default, white starts ofc
+        BoardState { board, turn: Colour::White}
     }
 }

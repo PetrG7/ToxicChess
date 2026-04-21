@@ -8,7 +8,6 @@ use crate::pieces::{Colour, Piece, PieceType};
 pub fn draw(state: &BoardState) {
     //get the board
     let current = state.get_board();
-    let occupied = state.occupied_squares();
     //nested loop - could be done much better, but its only for debugging
     // -> no performance needed
     //using print for better control over newlines

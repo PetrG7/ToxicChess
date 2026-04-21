@@ -16,11 +16,17 @@ fn main() {
     //here lies my logic for chessboard initialization
     //esentially it will be a vector of pieces, also there will be another vector with occupied fields
     //so that i can easily calculate legal moves
-    let mut board: Vec<Piece> = Vec::new();
+    let mut board: Vec<Piece> = vec![];
 
     //"push" my "pieces" onto the "chessboard"
     //here i put a white bishop on the coords A3 (3 = 3, 1 = A)
     board.push(Piece::new(PieceType::Bishop, b'H', 5, Colour::White, false).unwrap());
+
+    board.push(Piece::new(PieceType::King, b'D', 1, Colour::White, false).unwrap());
+
+    board.push(Piece::new(PieceType::King, b'D', 5, Colour::Black, false).unwrap());
+
+    board.push(Piece::new(PieceType::Rook, b'H', 4, Colour::Black, false).unwrap());
     //white pawns
     //the reason for the goofy double borrow is some rust stuff
     //if there was no & before letter i would have to deref in the board.push call
@@ -28,22 +34,27 @@ fn main() {
         //println!("{}", letter);
         board.push(Piece::new(PieceType::Pawn, letter, 3, Colour::White, false).unwrap());
     }
-    //init GameState
-    //demonstrating the Result of BoardState::new
-    let gamestate = BoardState::new(board);
-    match gamestate{
-    	Ok(state) => draw(&state),
+
+
+  	//testing the legal moves func
+    match BoardState::new(board, Colour::White){
+    	Ok(state) => {let gamestate = state;
+			 draw(&gamestate);
+			 let legal = gamestate.legal_moves();
+			 println!("{:?}", legal);
+
+    	},
     	Err(e) => println!("{}", e),
     }
-    
+
 
     let gamestate_default = BoardState::populate_default();
     draw(&gamestate_default);
     //make a move
 
     //testing occupied squares function
-    let occupied = gamestate_default.occupied_squares();
+    let occupied = gamestate_default.occupied_squares(&Colour::White);
     // println!("{:?}", occupied);
+    
 
-    gamestate_default.legal_moves(occupied);
 }
