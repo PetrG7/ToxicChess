@@ -79,6 +79,6 @@ impl Piece {
     }
     //for knowing whether the piece has been moved
     pub fn has_moved(&self) -> &bool {
-    	&self.has_moved
+        &self.has_moved
     }
 }
