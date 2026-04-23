@@ -1,6 +1,6 @@
 mod gamestate;
 use gamestate::GameState;
-use gamestate::{ Colour, Piece };
+use gamestate::{Colour, Piece};
 
 fn main() {
     println!("Hello, BitBoard chess!");
@@ -10,6 +10,7 @@ fn main() {
 
     game.add(Piece::Rook, Colour::Black, 3, 4).unwrap();
 
-    println!("{:?}", game);
+    //println!("{:?}", game);
 
+    game.print();
 }

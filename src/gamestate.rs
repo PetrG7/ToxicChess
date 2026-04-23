@@ -39,12 +39,12 @@ pub enum Colour {
 
 //helping enum for adding pieces
 pub enum Piece {
-	Pawn, 
-	Knight,
-	Bishop, 
-	Rook,
-	Queen,
-	King,
+    Pawn,
+    Knight,
+    Bishop,
+    Rook,
+    Queen,
+    King,
 }
 
 //impl display for debbuging purpouses
@@ -57,31 +57,28 @@ impl fmt::Display for Colour {
     }
 }
 
-//impl display for debbugging purpouses 
+//impl display for debbugging purpouses
 impl fmt::Display for Piece {
-	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-		match self {
-			Self::Pawn => write!(f, "pawn"),
-			Self::Knight => write!(f, "knight"),
-			Self::Bishop => write!(f, "bishop"),
-			Self::Rook => write!(f, "rook"),
-			Self::Queen => write!(f, "queen"),
-			Self::King => write!(f, "king"),
-		}
-	}
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            Self::Pawn => write!(f, "pawn"),
+            Self::Knight => write!(f, "knight"),
+            Self::Bishop => write!(f, "bishop"),
+            Self::Rook => write!(f, "rook"),
+            Self::Queen => write!(f, "queen"),
+            Self::King => write!(f, "king"),
+        }
+    }
 }
 
 //implementing structures to add pieces
 impl GameState {
-
-	//function to add pieces to the board
-    pub fn add(&mut self, piece: Piece, colour: Colour, x: u8, y: u8) -> Result<(), &'static str>{
+    //function to add pieces to the board
+    pub fn add(&mut self, piece: Piece, colour: Colour, x: u8, y: u8) -> Result<(), &'static str> {
         //check whether x and y are possible values - colour is safe, because it is an enum, piece_type will be handled by matching
         if x > 7 || y > 7 {
             //don't know whether it is better to handle the error here, or later with this function returning option.
-            return Err(
-                "You tried placing a piece out of bounds. That is illegal!"
-            );          
+            return Err("You tried placing a piece out of bounds. That is illegal!");
         }
 
         //gather all pieces bitboard (all occupied squares)
@@ -89,44 +86,106 @@ impl GameState {
         //calculate the index
         let index = get_index(x, y);
 
-
         //check whether the square already has a piece on it
-		if is_bit_set(full_bitboard, index) {
-			return Err("There is already a piece assigned to square with your provided coordinates. That is illegal!");
-		}
-
-		else {
-			//make the piece mask
-			let mask = 1u64 << index;
-			//have to use reference for colour here, because i can't consume it
-			//and I need to use it later
-			match (piece, &colour) {
-				(Piece::Pawn, Colour::White) => self.white_pawns |= mask,
-				(Piece::Knight, Colour::White) => self.white_knights |= mask,
-				(Piece::Bishop, Colour::White) => self.white_bishops |= mask,
-				(Piece::Rook, Colour::White) => self.white_rooks |= mask,
-				(Piece::Queen, Colour::White) => self.white_queens |= mask,
-				(Piece::King, Colour::White) => self.white_king |= mask,
-				(Piece::Pawn, Colour::Black) => self.black_pawns |= mask,
-				(Piece::Knight, Colour::Black) => self.black_knights |= mask,
-				(Piece::Bishop, Colour::Black) => self.black_bishops |= mask,
-				(Piece::Rook, Colour::Black) => self.black_rooks |= mask,
-				(Piece::Queen, Colour::Black) => self.black_queens |= mask,
-				(Piece::King, Colour::Black) => self.black_king |= mask,
-			}
-			//also include the piece in the full colour bitboard
-			match colour {
-				Colour::White => self.white_pieces |= mask,
-				Colour:: Black => self.black_pieces |= mask,
-			}
-			
-			
-		}
-		Ok(())
+        if is_bit_set(full_bitboard, index) {
+            return Err(
+                "There is already a piece assigned to square with your provided coordinates. That is illegal!",
+            );
+        } else {
+            //make the piece mask
+            let mask = 1u64 << index;
+            //have to use reference for colour here, because i can't consume it
+            //and I need to use it later
+            match (piece, &colour) {
+                (Piece::Pawn, Colour::White) => self.white_pawns |= mask,
+                (Piece::Knight, Colour::White) => self.white_knights |= mask,
+                (Piece::Bishop, Colour::White) => self.white_bishops |= mask,
+                (Piece::Rook, Colour::White) => self.white_rooks |= mask,
+                (Piece::Queen, Colour::White) => self.white_queens |= mask,
+                (Piece::King, Colour::White) => self.white_king |= mask,
+                (Piece::Pawn, Colour::Black) => self.black_pawns |= mask,
+                (Piece::Knight, Colour::Black) => self.black_knights |= mask,
+                (Piece::Bishop, Colour::Black) => self.black_bishops |= mask,
+                (Piece::Rook, Colour::Black) => self.black_rooks |= mask,
+                (Piece::Queen, Colour::Black) => self.black_queens |= mask,
+                (Piece::King, Colour::Black) => self.black_king |= mask,
+            }
+            //also include the piece in the full colour bitboard
+            match colour {
+                Colour::White => self.white_pieces |= mask,
+                Colour::Black => self.black_pieces |= mask,
+            }
+        }
+        Ok(())
     }
 
     //init function
     pub fn new() -> Self {
         GameState::default()
+    }
+
+    //print current gamestate - for debug purpouses
+    pub fn print(&self) {
+        //construct full bitmap
+        let full_bitboard = self.white_pieces | self.black_pieces;
+
+        println!(" --- --- --- --- --- --- --- --- ");
+        print!("|");
+
+        //iterate over individual fields and check whether there is a piece on that field
+        for i in 0..=63 {
+            //if there is a piece at that location
+            if is_bit_set(full_bitboard, i) {
+                //check for white colour
+                if is_bit_set(self.white_pieces, i) {
+                    //check over individual pieces - this is painful
+                    if is_bit_set(self.white_pawns, i) {
+                        print!(" ♟ |");
+                    } else if is_bit_set(self.white_knights, i) {
+                        print!(" ♞ |");
+                    } else if is_bit_set(self.white_bishops, i) {
+                        print!(" ♝ |");
+                    } else if is_bit_set(self.white_rooks, i) {
+                        print!(" ♜ |");
+                    } else if is_bit_set(self.white_queens, i) {
+                        print!(" ♛ |");
+                    }
+                    //nothing else than king can happen - HOPEFULLY !
+                    else {
+                        print!(" ♚ |");
+                    }
+                }
+                //if the piece is black
+                else {
+                    if is_bit_set(self.black_pawns, i) {
+                        print!(" ♙ |");
+                    } else if is_bit_set(self.black_knights, i) {
+                        print!(" ♘ |");
+                    } else if is_bit_set(self.black_bishops, i) {
+                        print!(" ♗ |");
+                    } else if is_bit_set(self.black_rooks, i) {
+                        print!(" ♖ |");
+                    } else if is_bit_set(self.black_queens, i) {
+                        print!(" ♕ |");
+                    }
+                    //nothing else than king can happen - HOPEFULLY !
+                    else {
+                        print!(" ♔ |");
+                    }
+                }
+            }
+            //if there is not a bit at that location
+            else {
+                if i % 7 == 0 && i != 0 && i != 63 {
+                    //number of row
+                    print!("   |");
+                    println!(" {}", i / 7);
+                    println!(" --- --- --- --- --- --- --- --- ");
+                    print!("|");
+                }
+                print!("   |");
+            }
+        }
+        println!("\n  A   B   C   D   E   F   G   H  ");
     }
 }
