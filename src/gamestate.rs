@@ -124,74 +124,80 @@ impl GameState {
         GameState::default()
     }
 
-    //print current gamestate - for debug purpouses
-    pub fn print(&self) {
+    //init function with default pieces - how it would look, if it were a start of the game
+    pub fn new_default() -> Self {
+    //it would be easier to express these numbers using bitwise arithmetic
+    //hovewer i want to do it like this, so its visible
+        Self {
+        	//white pieces
+			white_pawns: 0b00000000_00000000_00000000_00000000_00000000_00000000_11111111_00000000,
+			white_knights: 0b00000000_00000000_00000000_00000000_00000000_00000000_00000000_01000010,
+			white_bishops: 0b00000000_00000000_00000000_00000000_00000000_00000000_00000000_00100100,
+			white_rooks: 0b00000000_00000000_00000000_00000000_00000000_00000000_00000000_10000001,
+			white_queens: 0b00000000_00000000_00000000_00000000_00000000_00000000_00000000_00001000,
+			white_king: 0b00000000_00000000_00000000_00000000_00000000_00000000_00000000_00010000,
+			//black pieces
+			black_pawns: 0b00000000_11111111_00000000_00000000_00000000_00000000_00000000_00000000,
+			black_knights: 0b01000010_00000000_00000000_00000000_00000000_00000000_00000000_00000000,
+			black_bishops: 0b00100100_00000000_00000000_00000000_00000000_00000000_00000000_00000000,
+			black_rooks: 0b10000001_00000000_00000000_00000000_00000000_00000000_00000000_00000000,
+			black_queens: 0b00001000_00000000_00000000_00000000_00000000_00000000_00000000_00000000,
+			black_king: 0b00010000_00000000_00000000_00000000_00000000_00000000_00000000_00000000,
+			//full map
+			white_pieces: 0b00000000_00000000_00000000_00000000_00000000_00000000_11111111_11111111,
+			black_pieces: 0b11111111_11111111_00000000_00000000_00000000_00000000_00000000_00000000,     	
+        }
+    }
+
+	//print current gamestate - for debug purpouses
+    pub fn display(&self) {
         //construct full bitmap
         let full_bitboard = self.white_pieces | self.black_pieces;
 
         println!(" --- --- --- --- --- --- --- --- ");
-        print!("|");
 
-        //iterate over individual fields and check whether there is a piece on that field
-        for i in 0..=63 {
-            //if there is a piece at that location
-            if is_bit_set(full_bitboard, i) {
-                //check for white colour
-                if is_bit_set(self.white_pieces, i) {
-                    //check over individual pieces - this is painful
-                    if is_bit_set(self.white_pawns, i) {
-                        print!(" ♟ |");
-                    } else if is_bit_set(self.white_knights, i) {
-                        print!(" ♞ |");
-                    } else if is_bit_set(self.white_bishops, i) {
-                        print!(" ♝ |");
-                    } else if is_bit_set(self.white_rooks, i) {
-                        print!(" ♜ |");
-                    } else if is_bit_set(self.white_queens, i) {
-                        print!(" ♛ |");
+        // Iterate through ranks (rows) from top (8) to bottom (1)
+        for rank in (0..8).rev() {
+            print!("|");
+
+            // Iterate through files (columns) from left (A) to right (H)
+            for file in 0..8 {
+                // Calculate the 1D bitboard index from our 2D coordinates
+                let i = rank * 8 + file;
+
+                //if there is a piece at that location
+                if is_bit_set(full_bitboard, i) {
+                    //check for white colour
+                    if is_bit_set(self.white_pieces, i) {
+                        if is_bit_set(self.white_pawns, i) { print!(" ♟ |"); } 
+                        else if is_bit_set(self.white_knights, i) { print!(" ♞ |"); } 
+                        else if is_bit_set(self.white_bishops, i) { print!(" ♝ |"); } 
+                        else if is_bit_set(self.white_rooks, i) { print!(" ♜ |"); } 
+                        else if is_bit_set(self.white_queens, i) { print!(" ♛ |"); } 
+                        else { print!(" ♚ |"); }
                     }
-                    //nothing else than king can happen - HOPEFULLY !
+                    //if the piece is black
                     else {
-                        print!(" ♚ |");
+                        if is_bit_set(self.black_pawns, i) { print!(" ♙ |"); } 
+                        else if is_bit_set(self.black_knights, i) { print!(" ♘ |"); } 
+                        else if is_bit_set(self.black_bishops, i) { print!(" ♗ |"); } 
+                        else if is_bit_set(self.black_rooks, i) { print!(" ♖ |"); } 
+                        else if is_bit_set(self.black_queens, i) { print!(" ♕ |"); } 
+                        else { print!(" ♔ |"); }
                     }
                 }
-                //if the piece is black
+                //if there is not a bit at that location
                 else {
-                    if is_bit_set(self.black_pawns, i) {
-                        print!(" ♙ |");
-                    } else if is_bit_set(self.black_knights, i) {
-                        print!(" ♘ |");
-                    } else if is_bit_set(self.black_bishops, i) {
-                        print!(" ♗ |");
-                    } else if is_bit_set(self.black_rooks, i) {
-                        print!(" ♖ |");
-                    } else if is_bit_set(self.black_queens, i) {
-                        print!(" ♕ |");
-                    }
-                    //nothing else than king can happen - HOPEFULLY !
-                    else {
-                        print!(" ♔ |");
-                    }
+                    print!("   |");
                 }
             }
-            //if there is not a bit at that location
-            else {
 
-                print!("   |");
-            }
-			//printing the row ends
-            if (i + 1) % 8 == 0 {
-                //number of row
-                println!(" {}", (i / 8) + 1);
-
-                if i != 63 {
-	                println!(" --- --- --- --- --- --- --- --- ");
-	                print!("|");         	
-                }
-
-            }
+            // Printing the row ends. We print the rank number, then drop to the next line for the divider.
+            println!(" {}", rank + 1);
+            println!(" --- --- --- --- --- --- --- --- ");
         }
-        println!(" --- --- --- --- --- --- --- --- ");
+        
+        // Print the file letters at the very bottom
         println!("  A   B   C   D   E   F   G   H  ");
     }
 }
