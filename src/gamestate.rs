@@ -176,16 +176,22 @@ impl GameState {
             }
             //if there is not a bit at that location
             else {
-                if i % 7 == 0 && i != 0 && i != 63 {
-                    //number of row
-                    print!("   |");
-                    println!(" {}", i / 7);
-                    println!(" --- --- --- --- --- --- --- --- ");
-                    print!("|");
-                }
+
                 print!("   |");
             }
+			//printing the row ends
+            if (i + 1) % 8 == 0 {
+                //number of row
+                println!(" {}", (i / 8) + 1);
+
+                if i != 63 {
+	                println!(" --- --- --- --- --- --- --- --- ");
+	                print!("|");         	
+                }
+
+            }
         }
-        println!("\n  A   B   C   D   E   F   G   H  ");
+        println!(" --- --- --- --- --- --- --- --- ");
+        println!("  A   B   C   D   E   F   G   H  ");
     }
 }

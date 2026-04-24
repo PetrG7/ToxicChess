@@ -8,6 +8,7 @@ fn main() {
     let mut game = GameState::new();
     println!("{:?}", game);
 
+	//place a rook at D, 5
     game.add(Piece::Rook, Colour::Black, 3, 4).unwrap();
 
     //println!("{:?}", game);
