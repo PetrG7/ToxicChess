@@ -126,30 +126,39 @@ impl GameState {
 
     //init function with default pieces - how it would look, if it were a start of the game
     pub fn new_default() -> Self {
-    //it would be easier to express these numbers using bitwise arithmetic
-    //hovewer i want to do it like this, so its visible
+        //it would be easier to express these numbers using bitwise arithmetic
+        //hovewer i want to do it like this, so its visible
         Self {
-        	//white pieces
-			white_pawns: 0b00000000_00000000_00000000_00000000_00000000_00000000_11111111_00000000,
-			white_knights: 0b00000000_00000000_00000000_00000000_00000000_00000000_00000000_01000010,
-			white_bishops: 0b00000000_00000000_00000000_00000000_00000000_00000000_00000000_00100100,
-			white_rooks: 0b00000000_00000000_00000000_00000000_00000000_00000000_00000000_10000001,
-			white_queens: 0b00000000_00000000_00000000_00000000_00000000_00000000_00000000_00001000,
-			white_king: 0b00000000_00000000_00000000_00000000_00000000_00000000_00000000_00010000,
-			//black pieces
-			black_pawns: 0b00000000_11111111_00000000_00000000_00000000_00000000_00000000_00000000,
-			black_knights: 0b01000010_00000000_00000000_00000000_00000000_00000000_00000000_00000000,
-			black_bishops: 0b00100100_00000000_00000000_00000000_00000000_00000000_00000000_00000000,
-			black_rooks: 0b10000001_00000000_00000000_00000000_00000000_00000000_00000000_00000000,
-			black_queens: 0b00001000_00000000_00000000_00000000_00000000_00000000_00000000_00000000,
-			black_king: 0b00010000_00000000_00000000_00000000_00000000_00000000_00000000_00000000,
-			//full map
-			white_pieces: 0b00000000_00000000_00000000_00000000_00000000_00000000_11111111_11111111,
-			black_pieces: 0b11111111_11111111_00000000_00000000_00000000_00000000_00000000_00000000,     	
+            //white pieces
+            white_pawns: 0b00000000_00000000_00000000_00000000_00000000_00000000_11111111_00000000,
+            white_knights:
+                0b00000000_00000000_00000000_00000000_00000000_00000000_00000000_01000010,
+            white_bishops:
+                0b00000000_00000000_00000000_00000000_00000000_00000000_00000000_00100100,
+            white_rooks: 0b00000000_00000000_00000000_00000000_00000000_00000000_00000000_10000001,
+            white_queens: 0b00000000_00000000_00000000_00000000_00000000_00000000_00000000_00001000,
+            white_king: 0b00000000_00000000_00000000_00000000_00000000_00000000_00000000_00010000,
+            //black pieces
+            black_pawns: 0b00000000_11111111_00000000_00000000_00000000_00000000_00000000_00000000,
+            black_knights:
+                0b01000010_00000000_00000000_00000000_00000000_00000000_00000000_00000000,
+            black_bishops:
+                0b00100100_00000000_00000000_00000000_00000000_00000000_00000000_00000000,
+            black_rooks: 0b10000001_00000000_00000000_00000000_00000000_00000000_00000000_00000000,
+            black_queens: 0b00001000_00000000_00000000_00000000_00000000_00000000_00000000_00000000,
+            black_king: 0b00010000_00000000_00000000_00000000_00000000_00000000_00000000_00000000,
+            //full map
+            white_pieces: 0b00000000_00000000_00000000_00000000_00000000_00000000_11111111_11111111,
+            black_pieces: 0b11111111_11111111_00000000_00000000_00000000_00000000_00000000_00000000,
         }
     }
 
-	//print current gamestate - for debug purpouses
+	//function to move piece -> change the board
+    pub fn move_piece(&mut self, current_x: u8, current_y: u8, target_x: u8, target_y: u8){
+    	todo!()
+    }
+
+    //print current gamestate - for debug purpouses
     pub fn display(&self) {
         //construct full bitmap
         let full_bitboard = self.white_pieces | self.black_pieces;
@@ -169,21 +178,35 @@ impl GameState {
                 if is_bit_set(full_bitboard, i) {
                     //check for white colour
                     if is_bit_set(self.white_pieces, i) {
-                        if is_bit_set(self.white_pawns, i) { print!(" ♟ |"); } 
-                        else if is_bit_set(self.white_knights, i) { print!(" ♞ |"); } 
-                        else if is_bit_set(self.white_bishops, i) { print!(" ♝ |"); } 
-                        else if is_bit_set(self.white_rooks, i) { print!(" ♜ |"); } 
-                        else if is_bit_set(self.white_queens, i) { print!(" ♛ |"); } 
-                        else { print!(" ♚ |"); }
+                        if is_bit_set(self.white_pawns, i) {
+                            print!(" ♟ |");
+                        } else if is_bit_set(self.white_knights, i) {
+                            print!(" ♞ |");
+                        } else if is_bit_set(self.white_bishops, i) {
+                            print!(" ♝ |");
+                        } else if is_bit_set(self.white_rooks, i) {
+                            print!(" ♜ |");
+                        } else if is_bit_set(self.white_queens, i) {
+                            print!(" ♛ |");
+                        } else {
+                            print!(" ♚ |");
+                        }
                     }
                     //if the piece is black
                     else {
-                        if is_bit_set(self.black_pawns, i) { print!(" ♙ |"); } 
-                        else if is_bit_set(self.black_knights, i) { print!(" ♘ |"); } 
-                        else if is_bit_set(self.black_bishops, i) { print!(" ♗ |"); } 
-                        else if is_bit_set(self.black_rooks, i) { print!(" ♖ |"); } 
-                        else if is_bit_set(self.black_queens, i) { print!(" ♕ |"); } 
-                        else { print!(" ♔ |"); }
+                        if is_bit_set(self.black_pawns, i) {
+                            print!(" ♙ |");
+                        } else if is_bit_set(self.black_knights, i) {
+                            print!(" ♘ |");
+                        } else if is_bit_set(self.black_bishops, i) {
+                            print!(" ♗ |");
+                        } else if is_bit_set(self.black_rooks, i) {
+                            print!(" ♖ |");
+                        } else if is_bit_set(self.black_queens, i) {
+                            print!(" ♕ |");
+                        } else {
+                            print!(" ♔ |");
+                        }
                     }
                 }
                 //if there is not a bit at that location
@@ -196,7 +219,7 @@ impl GameState {
             println!(" {}", rank + 1);
             println!(" --- --- --- --- --- --- --- --- ");
         }
-        
+
         // Print the file letters at the very bottom
         println!("  A   B   C   D   E   F   G   H  ");
     }
